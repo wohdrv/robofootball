@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - Initial repository setup
 
-## [v0.1.0] — Date: YYYY-MM-DD
+## [v0.1.0] — Date: 2026.01.21
 ### Added
 - First working robot prototype
 - Basic movement functionality (drive forward)
