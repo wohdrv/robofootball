@@ -1,99 +1,107 @@
-// подключите пины контроллера к цифровым пинам Arduino
+#include <Arduino.h>
+#include <IRremoteESP8266.h>
+#include <IRrecv.h>
+#include <IRutils.h>
 
-// первый двигатель
-int enA = 16;
-int in1 = 5;
-int in2 = 4;
+// Motors (current pins)
+int enA = 16; // D0
+int in1 = 5;  // D1
+int in2 = 4;  // D2
 
-// второй двигатель
-int enB = 14;
-int in3 = 0;
-int in4 = 2;
+int enB = 14; // D5
+int in3 = 0;  // D3
+int in4 = 2;  // D4
 
-void setup()
-{
-  // инициализируем все пины для управления двигателями как outputs
-  pinMode(enA, OUTPUT);  
-  pinMode(enB, OUTPUT);  
-  pinMode(in1, OUTPUT);  
-  pinMode(in2, OUTPUT);  
-  pinMode(in3, OUTPUT);  
+// IR receiver
+const uint16_t kRecvPin = 13; // D7
+IRrecv irrecv(kRecvPin);
+decode_results results;
+
+// Remote control codes
+const uint32_t forwardCode  = 0xFF18E7;
+const uint32_t backwardCode = 0xFF4AB5;
+const uint32_t leftCode     = 0xFF10EF;
+const uint32_t rightCode    = 0xFF5AA5;
+
+uint32_t lastCode = 0;      // Last command
+unsigned long lastTime = 0; // Time of the last signal
+const unsigned long timeout = 200; // ms until stop
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+
+  pinMode(enB, OUTPUT);
+  pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
+
+  digitalWrite(enA, HIGH);
+  digitalWrite(enB, HIGH);
+
+  irrecv.enableIRIn();
 }
 
-// эта функция обеспечит вращение двигателей в двух направлениях на установленной скорости
-void demoOne()
-{  
-  // запуск двигателя A
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  // устанавливаем скорость 100 из доступного диапазона 0~255
-  analogWrite(enA, 100);
-
-  // запуск двигателя B
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-  // устанавливаем скорость 100 из доступного диапазона 0~255
-  analogWrite(enB, 100);
-  
-  delay(2000);
-
-  // меняем направление вращения двигателей
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-
-  delay(2000);
-
-  // выключаем двигатели
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+void driveMotor(uint32_t code) {
+  // Forward
+  if (code == forwardCode) {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+  }
+  // Backward
+  else if (code == backwardCode) {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+  }
+  // Left
+  else if (code == leftCode) {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+  }
+  // Right
+  else if (code == rightCode) {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+  }
+  // Stop
+  else {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
+  }
 }
 
-// эта функция обеспечивает работу двигателей во всем диапазоне возможных скоростей
-void demoTwo()
-{
-  // обратите внимание, что максимальная скорость определяется самим двигателем и напряжением питания
-  // ШИМ-значения генерируются функцией analogWrite()
-  // и зависят от вашей платы управления
+void loop() {
+  if (irrecv.decode(&results)) {
+    uint32_t value = results.value;
 
-  // запускаем двигатели
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
+    // If repeat code
+    if (value == 0xFFFFFFFF) {
+      value = lastCode; // repeat the last command
+    } else {
+      lastCode = value; // save the new command
+    }
 
-  // ускорение от нуля до максимального значения
-  for (int i = 0; i < 256; i++)
-  {
-    analogWrite(enA, i);    
-    analogWrite(enB, i);    
-    delay(20);
+    lastTime = millis(); // update the time of the last signal
+    driveMotor(value);   // execute the command
+
+    irrecv.resume();
   }
 
-  // торможение от максимального значения к минимальному
-  for (int i = 255; i >= 0; --i)
-  {
-    analogWrite(enA, i);
-    analogWrite(enB, i);
-    delay(20);
+  // Timeout check: if no signal > timeout → stop
+  if (millis() - lastTime > timeout) {
+    driveMotor(0); // stop
+    lastCode = 0;
   }
-
-  // теперь отключаем моторы
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
-}
-
-void loop()
-{
-  demoOne();
-  delay(1000);
-  
-  demoTwo();
-  delay(1000);
 }
