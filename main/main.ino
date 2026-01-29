@@ -1,107 +1,150 @@
-#include <Arduino.h>
-#include <IRremoteESP8266.h>
-#include <IRrecv.h>
-#include <IRutils.h>
+const int D0 = 33; // Мотор 1 - направление A
+const int D1 = 25; // Мотор 1 - направление B
+const int D2 = 26; // Мотор 2 - направление A
+const int D3 = 27; // Мотор 2 - направление B
 
-// Motors (current pins)
-int enA = 16; // D0
-int in1 = 5;  // D1
-int in2 = 4;  // D2
+const int D0b = 23; // Мотор 3 - направление A
+const int D1b = 22; // Мотор 3 - направление B
+const int D2b = 19; // Мотор 4 - направление A
+const int D3b = 18; // Мотор 4 - направление B
 
-int enB = 14; // D5
-int in3 = 0;  // D3
-int in4 = 2;  // D4
-
-// IR receiver
-const uint16_t kRecvPin = 13; // D7
-IRrecv irrecv(kRecvPin);
-decode_results results;
-
-// Remote control codes
-const uint32_t forwardCode  = 0xFF18E7;
-const uint32_t backwardCode = 0xFF4AB5;
-const uint32_t leftCode     = 0xFF10EF;
-const uint32_t rightCode    = 0xFF5AA5;
-
-uint32_t lastCode = 0;      // Last command
-unsigned long lastTime = 0; // Time of the last signal
-const unsigned long timeout = 200; // ms until stop
+const int PWM_FREQ = 1000;      // Частота PWM 1 кГц
+const int PWM_RESOLUTION = 8;   // 8-bit разрешение (0-255)
 
 void setup() {
   Serial.begin(115200);
+  
+  // Настройка PWM для каждого пина
+  ledcAttach(D0, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(D1, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(D2, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(D3, PWM_FREQ, PWM_RESOLUTION);
 
-  pinMode(enA, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-
-  pinMode(enB, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
-
-  digitalWrite(enA, HIGH);
-  digitalWrite(enB, HIGH);
-
-  irrecv.enableIRIn();
-}
-
-void driveMotor(uint32_t code) {
-  // Forward
-  if (code == forwardCode) {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-  }
-  // Backward
-  else if (code == backwardCode) {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
-  }
-  // Left
-  else if (code == leftCode) {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-  }
-  // Right
-  else if (code == rightCode) {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
-  }
-  // Stop
-  else {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, LOW);
-  }
+  ledcAttach(D0b, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(D1b, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(D2b, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttach(D3b, PWM_FREQ, PWM_RESOLUTION);
+  
+  Serial.println("Моторы инициализированы");
 }
 
 void loop() {
-  if (irrecv.decode(&results)) {
-    uint32_t value = results.value;
+  Serial.println("Вперёд на полной скорости");
+  moveForward(255);
+  delay(2000);
+  
+  Serial.println("Стоп");
+  stopMotors();
+  delay(1000);
+  
+  Serial.println("Назад на полной скорости");
+  moveBackward(255);
+  delay(2000);
+  
+  Serial.println("Стоп");
+  stopMotors();
+  delay(1000);
 
-    // If repeat code
-    if (value == 0xFFFFFFFF) {
-      value = lastCode; // repeat the last command
-    } else {
-      lastCode = value; // save the new command
-    }
+  Serial.println("Вправо на полной скорости");
+  moveRight(255);
+  delay(2000);
+  
+  Serial.println("Стоп");
+  stopMotors();
+  delay(1000);
 
-    lastTime = millis(); // update the time of the last signal
-    driveMotor(value);   // execute the command
+  Serial.println("Влево на полной скорости");
+  moveLeft(255);
+  delay(2000);
 
-    irrecv.resume();
-  }
+  stopMotors();
+  delay(3000);
+}
 
-  // Timeout check: if no signal > timeout → stop
-  if (millis() - lastTime > timeout) {
-    driveMotor(0); // stop
-    lastCode = 0;
-  }
+// Движение вперёд
+void moveForward(int speed) {
+  // Мотор 1 вперёд
+  ledcWrite(D0, speed);
+  ledcWrite(D1, 0);
+  
+  // Мотор 2 вперёд
+  ledcWrite(D2, speed);
+  ledcWrite(D3, 0);
+
+  // Мотор 3 вперёд
+  ledcWrite(D0b, speed);
+  ledcWrite(D1b, 0);
+  
+  // Мотор 4 вперёд
+  ledcWrite(D2b, speed);
+  ledcWrite(D3b, 0);
+}
+
+// Движение назад
+void moveBackward(int speed) {
+  // Мотор 1 назад
+  ledcWrite(D0, 0);
+  ledcWrite(D1, speed);
+  
+  // Мотор 2 назад
+  ledcWrite(D2, 0); 
+  ledcWrite(D3, speed);
+
+  // Мотор 3 назад
+  ledcWrite(D0b, 0);
+  ledcWrite(D1b, speed);
+  
+  // Мотор 4 назад
+  ledcWrite(D2b, 0); 
+  ledcWrite(D3b, speed);
+}
+
+// Движение вправо
+void moveRight(int speed) {
+  // Мотор 1 вперед
+  ledcWrite(D0, speed);
+  ledcWrite(D1, 0);
+  
+  // Мотор 2 назад
+  ledcWrite(D2, 0); 
+  ledcWrite(D3, speed);
+
+  // Мотор 3 вперед
+  ledcWrite(D0b, speed);
+  ledcWrite(D1b, 0);
+  
+  // Мотор 4 назад
+  ledcWrite(D2b, 0); 
+  ledcWrite(D3b, speed);
+}
+
+// Движение вправо
+void moveLeft(int speed) {
+  // Мотор 1 назад
+  ledcWrite(D0, 0);
+  ledcWrite(D1, speed);
+  
+  // Мотор 2 вперед
+  ledcWrite(D2, speed); 
+  ledcWrite(D3, 0);
+
+  // Мотор 3 назад
+  ledcWrite(D0b, 0);
+  ledcWrite(D1b, speed);
+  
+  // Мотор 4 впереж
+  ledcWrite(D2b, speed); 
+  ledcWrite(D3b, 0);
+}
+
+// Остановка моторов
+void stopMotors() {
+  ledcWrite(D0, 0);
+  ledcWrite(D1, 0);
+  ledcWrite(D2, 0);
+  ledcWrite(D3, 0);
+  ledcWrite(D0b, 0);
+  ledcWrite(D1b, 0);
+  ledcWrite(D2b, 0);
+  ledcWrite(D3b, 0);
 }
