@@ -34,7 +34,8 @@ All notable changes to this project will be documented in this file.
 
 ## [v0.1.2] — Date: 2026.01.29
 ### Added
-- 
+- ESP32
+- new code for ZK-5AD drivers
 
 ### Hardware
 - Microcontroller: ESP32 WROOM (38pin)
@@ -44,4 +45,4 @@ All notable changes to this project will be documented in this file.
 
 ### Notes
 - This is a quite big update, as we started using an ESP32 WROOM (38-pin) with an extension board.
-We also started using two ZK-5AD motor drivers and new omni wheels.
+We also started using two ZK-5AD motor drivers and new omni wheels. Each wheel is controlled separately and independently.
