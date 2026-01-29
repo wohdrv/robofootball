@@ -20,3 +20,14 @@ All notable changes to this project will be documented in this file.
 - This is the very first version of the robot
 - No sensors or autonomous logic implemented
 - Robot is capable of simple movement only
+
+## [v0.1.1] — Date: 2026.01.25
+### Added
+- RC control
+
+### Hardware
+- Microcontroller: ESP8266 NodeMCU
+- Motor driver: L298N
+
+### Notes
+- The robot can now be controlled using a remote controller, including moving forward, backward, and turning left or right.
