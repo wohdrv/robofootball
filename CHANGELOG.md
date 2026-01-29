@@ -31,3 +31,17 @@ All notable changes to this project will be documented in this file.
 
 ### Notes
 - The robot can now be controlled using a remote controller, including moving forward, backward, and turning left or right.
+
+## [v0.1.2] — Date: 2026.01.29
+### Added
+- 
+
+### Hardware
+- Microcontroller: ESP32 WROOM (38pin)
+- Motor driver: ZK-5AD
+- ESP32 38pin expansion board
+- Omni wheels
+
+### Notes
+- This is a quite big update, as we started using an ESP32 WROOM (38-pin) with an extension board.
+We also started using two ZK-5AD motor drivers and new omni wheels.
