@@ -1,4 +1,17 @@
-#include <IRremote.hpp>
+#define W 'W'
+#define A 'A'
+#define S 'S'
+#define D 'D'
+#define L 'L'
+#define R 'R'
+#define Q 'Q'
+#define E 'E'
+#define Z 'Z'
+#define X 'X'
+#define P 'P'
+#include <BluetoothSerial.h>
+
+BluetoothSerial SerialBT;
 
 const int IR = 15; //ИК приемник
 const int D0 = 33; // Мотор 1 - направление A
@@ -14,11 +27,10 @@ const int D3b = 18; // Мотор 4 - направление B
 const int PWM_FREQ = 1000;      // Частота PWM 1 кГц
 const int PWM_RESOLUTION = 8;   // 8-bit разрешение (0-255)
 
-unsigned long lastSignalTime = 0;
-const unsigned long SIGNAL_TIMEOUT = 200;
-
 void setup() {
   Serial.begin(115200);
+
+  SerialBT.begin("WinLeaders_1");
 
   // Настройка PWM для каждого пина
   ledcAttach(D0, PWM_FREQ, PWM_RESOLUTION);
@@ -32,63 +44,47 @@ void setup() {
   ledcAttach(D3b, PWM_FREQ, PWM_RESOLUTION);
   
   Serial.println("Моторы инициализированы");
-  
-  IrReceiver.begin(IR, ENABLE_LED_FEEDBACK);
-  Serial.println("ИК приемник инициализирован");
 }
 
 void loop() {
-    if (IrReceiver.decode()) {
-    lastSignalTime = millis();
+  if (SerialBT.available()) {
+    char cmd = SerialBT.read();
+    
+    switch(cmd) {
+      case 'W': moveForward(255); break;
+      case 'A': moveLeft(255); break;
+      case 'S': moveBackward(255); break;
+      case 'D': moveRight(255); break;
+      case 'R': turnRight(128); break;
+      case 'L': turnLeft(128); break;
+      case 'Q':
+        ledcWrite(D2, 255);
+        ledcWrite(D3, 0);
+        ledcWrite(D2b, 255);
+        ledcWrite(D3b, 0);
+        break;
+      case 'E':
+        ledcWrite(D0, 255);
+        ledcWrite(D1, 0);
+        ledcWrite(D0b, 255);
+        ledcWrite(D1b, 0);
+        break;
+      case 'Z':
+        ledcWrite(D2, 0);
+        ledcWrite(D3, 255);
+        ledcWrite(D2b, 0);
+        ledcWrite(D3b, 255);
+        break;
+      case 'X':
+        ledcWrite(D0, 0);
+        ledcWrite(D1, 255);
+        ledcWrite(D0b, 0);
+        ledcWrite(D1b, 255);
+        break;
+      case 'P': stopMotors(); break;
 
-    unsigned long seconds = lastSignalTime / 1000;
-    unsigned long minutes = seconds / 60;
-    unsigned long hours = minutes / 60;
-
-    Serial.println();
-    Serial.print(hours % 24);
-    Serial.print(":");
-    Serial.print(minutes % 60);
-    Serial.print(":");
-    Serial.print(seconds % 60);
-    Serial.println(" Signal recieved");
-    Serial.print("Protocol: ");
-    Serial.println(IrReceiver.decodedIRData.protocol);
-    Serial.print("Command ID: 0x");
-    Serial.println(IrReceiver.decodedIRData.command, HEX);
-
-    if (IrReceiver.decodedIRData.command == 0x18) {
-      moveForward(255);
-      delay(100);
-      stopMotors();
+      default: break;
     }
-    else if (IrReceiver.decodedIRData.command == 0x52) {
-      moveBackward(255);
-      delay(100);
-      stopMotors();
-    }
-    else if (IrReceiver.decodedIRData.command == 0x5A) {
-      moveRight(255);
-      delay(100);
-      stopMotors();
-    }
-    else if (IrReceiver.decodedIRData.command == 0x8) {
-      moveLeft(255);
-      delay(100);
-      stopMotors();
-    }
-    else if (IrReceiver.decodedIRData.command == 0xD) {
-      turnRight(128);
-      delay(100);
-      stopMotors();
-    }
-    else if (IrReceiver.decodedIRData.command == 0x16) {
-      turnLeft(128);
-      delay(100);
-      stopMotors();
-    }
-
-    IrReceiver.resume();
   }
 }
 

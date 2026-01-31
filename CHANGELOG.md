@@ -56,3 +56,12 @@ We also started using two ZK-5AD motor drivers and new omni wheels. Each wheel i
 
 ### Notes
 - This update was created to test the functionality of the motors and to calibrate the direction. All tests were successful.
+
+## [v0.1.4] — Date: 2026.01.31
+### Added
+- Replaced IR remote control with Bluetooth control via smartphone
+
+### Notes
+- The IR receiver proved to be a completely ineffective remote control solution. The signal didn't always get through, and there was frequent interference. Commands weren't executed, and the robot didn't respond.
+We decided replace IR remote control with Bluetooth control via smartphone. Significantly improved response time and movement precision. 
+Robot now moves accurately in all directions without hesitation.
