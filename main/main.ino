@@ -10,6 +10,12 @@
 #define X 'X'
 #define P 'P'
 #include <BluetoothSerial.h>
+//#include <ESP32Servo.h>
+//Servo servo1;  // create servo object to control a servo
+//Servo servo2;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+
+//int pos = 0;
 
 BluetoothSerial SerialBT;
 
@@ -25,7 +31,7 @@ const int D2b = 19; // Мотор 4 - направление A
 const int D3b = 18; // Мотор 4 - направление B
 
 const int PWM_FREQ = 1000;      // Частота PWM 1 кГц
-const int PWM_RESOLUTION = 8;   // 8-bit разрешение (0-255)
+const int PWM_RESOLUTION = 8;   // 8-bit разрешение (0-128)
 
 void setup() {
   Serial.begin(115200);
@@ -51,35 +57,35 @@ void loop() {
     char cmd = SerialBT.read();
     
     switch(cmd) {
-      case 'W': moveForward(255); break;
-      case 'A': moveLeft(255); break;
-      case 'S': moveBackward(255); break;
-      case 'D': moveRight(255); break;
+      case 'W': moveForward(128); break;
+      case 'A': moveLeft(128); break;
+      case 'S': moveBackward(128); break;
+      case 'D': moveRight(128); break;
       case 'R': turnRight(128); break;
       case 'L': turnLeft(128); break;
       case 'Q':
-        ledcWrite(D2, 255);
+        ledcWrite(D2, 128);
         ledcWrite(D3, 0);
-        ledcWrite(D2b, 255);
+        ledcWrite(D2b, 128);
         ledcWrite(D3b, 0);
         break;
       case 'E':
-        ledcWrite(D0, 255);
+        ledcWrite(D0, 128);
         ledcWrite(D1, 0);
-        ledcWrite(D0b, 255);
+        ledcWrite(D0b, 128);
         ledcWrite(D1b, 0);
         break;
       case 'Z':
         ledcWrite(D2, 0);
-        ledcWrite(D3, 255);
+        ledcWrite(D3, 128);
         ledcWrite(D2b, 0);
-        ledcWrite(D3b, 255);
+        ledcWrite(D3b, 128);
         break;
       case 'X':
         ledcWrite(D0, 0);
-        ledcWrite(D1, 255);
+        ledcWrite(D1, 128);
         ledcWrite(D0b, 0);
-        ledcWrite(D1b, 255);
+        ledcWrite(D1b, 128);
         break;
       case 'P': stopMotors(); break;
 
