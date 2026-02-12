@@ -65,3 +65,13 @@ We also started using two ZK-5AD motor drivers and new omni wheels. Each wheel i
 - The IR receiver proved to be a completely ineffective remote control solution. The signal didn't always get through, and there was frequent interference. Commands weren't executed, and the robot didn't respond.
 We decided replace IR remote control with Bluetooth control via smartphone. Significantly improved response time and movement precision. 
 Robot now moves accurately in all directions without hesitation.
+
+## [v0.1.5] — Date: 2026.02.11
+### Added
+- 2 servo motorss
+
+### Hardware
+- 2 servo motors SG90 (180 degrees)
+
+### Notes
+- In this update, we are tried to do a mechanism that will kick the ball. But we ran into some problems. We already fixing it
