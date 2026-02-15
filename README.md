@@ -9,6 +9,8 @@ https://youtu.be/iCxo-OgOEKI
 
 ## 🚀 Overview
 
+![Screenshot_2026-02-15-17-35-13-730_com miui gallery-edit jpg](https://github.com/user-attachments/assets/2807f428-6c45-46bd-a651-e68875ae14c5)
+
 This robot is designed for smooth, accurate movement in all directions using omni wheels and independent motor control.
 
 The final system focuses on:
@@ -89,4 +91,10 @@ This allows easy integration of:
 - Sensors  
 - Autonomous navigation  
 - Advanced control algorithms  
-- Competition-specific features  
+- Competition-specific features
+
+---
+
+## 🧩 Circuit Diagram
+
+<img width="2872" height="3156" alt="Circuit diagram" src="https://github.com/user-attachments/assets/d57bd07d-46c2-401d-9201-4352bc525e5c" />
