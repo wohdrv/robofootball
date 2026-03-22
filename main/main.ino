@@ -31,7 +31,7 @@ const int D2b = 19; // Мотор 4 - направление A
 const int D3b = 18; // Мотор 4 - направление B
 
 const int PWM_FREQ = 1000;      // Частота PWM 1 кГц
-const int PWM_RESOLUTION = 8;   // 8-bit разрешение (0-128)
+const int PWM_RESOLUTION = 8;   // 8-bit разрешение (0-230)
 
 void setup() {
   Serial.begin(115200);
@@ -57,35 +57,35 @@ void loop() {
     char cmd = SerialBT.read();
     
     switch(cmd) {
-      case 'W': moveForward(128); break;
-      case 'A': moveLeft(128); break;
-      case 'S': moveBackward(128); break;
-      case 'D': moveRight(128); break;
-      case 'R': turnRight(128); break;
-      case 'L': turnLeft(128); break;
+      case 'W': moveForward(230); break;
+      case 'A': moveLeft(230); break;
+      case 'S': moveBackward(230); break;
+      case 'D': moveRight(230); break;
+      case 'R': turnRight(230); break;
+      case 'L': turnLeft(230); break;
       case 'Q':
-        ledcWrite(D2, 128);
+        ledcWrite(D2, 230);
         ledcWrite(D3, 0);
-        ledcWrite(D2b, 128);
+        ledcWrite(D2b, 230);
         ledcWrite(D3b, 0);
         break;
       case 'E':
-        ledcWrite(D0, 128);
+        ledcWrite(D0, 230);
         ledcWrite(D1, 0);
-        ledcWrite(D0b, 128);
+        ledcWrite(D0b, 230);
         ledcWrite(D1b, 0);
         break;
       case 'Z':
         ledcWrite(D2, 0);
-        ledcWrite(D3, 128);
+        ledcWrite(D3, 230);
         ledcWrite(D2b, 0);
-        ledcWrite(D3b, 128);
+        ledcWrite(D3b, 230);
         break;
       case 'X':
         ledcWrite(D0, 0);
-        ledcWrite(D1, 128);
+        ledcWrite(D1, 230);
         ledcWrite(D0b, 0);
-        ledcWrite(D1b, 128);
+        ledcWrite(D1b, 230);
         break;
       case 'P': stopMotors(); break;
 
