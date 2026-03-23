@@ -1,4 +1,7 @@
 #include <BluetoothSerial.h>
+#include <esp_system.h>
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
 BluetoothSerial SerialBT;
 
@@ -15,8 +18,10 @@ const int PWM_FREQ = 1000;
 const int PWM_RESOLUTION = 8;
 
 void setup() {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+  
   Serial.begin(115200);
-  SerialBT.begin("WinLeaders_1");
+  SerialBT.begin("sassafrass");
 
   ledcAttach(D0, PWM_FREQ, PWM_RESOLUTION);
   ledcAttach(D1, PWM_FREQ, PWM_RESOLUTION);
